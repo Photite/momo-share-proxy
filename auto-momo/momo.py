@@ -1,6 +1,6 @@
 # encoding:utf-8
 from os import environ
-from ip import listIP, getheaders, ip_main  # 确保这些函数在ip模块中已正确实现
+from ip import listIP, getheaders, ip_main 
 from asyncio import create_task, wait, Semaphore, run
 from aiohttp import ClientSession, ClientTimeout
 
