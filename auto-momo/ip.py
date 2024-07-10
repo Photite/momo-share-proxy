@@ -137,7 +137,7 @@ async def soup_page(source, mod):
         temp = search(r'<div\sstyle=\"padding-left:20px;\">[\s]?(.*?)[\s]?</div>', source)
         pList = temp.group(1).strip().split('<br>')[:-2]
         for p in pList:
-            print(f"http://{p}")
+            listIP.append(f"http://{p}")
 
 
 def ip_main():
@@ -146,14 +146,28 @@ def ip_main():
     listIP = list(set(listIP))  # 代理去重
     print(f"代理ip抓取完成,共{len(listIP)}个可用代理ip地址。")
 
-    # 验证代理可用性
-    for ip in listIP:
-        try:
-            async with ClientSession() as session:
-                async with session.get(link, proxy=ip, timeout=ClientTimeout(total=5)) as response:
-                    if response.status == 200:
-                        print(f"代理 {ip} 可用")
-                    else:
-                        print(f"代理 {ip} 不可用")
-        except Exception as e:
-            print(f"验证代理 {ip} 失败:", e)
+
+async def verify_ip(ip):
+    try:
+        async with ClientSession() as session:
+            async with session.get(link, proxy=ip, timeout=ClientTimeout(total=5)) as response:
+                if response.status == 200:
+                    print(f"代理 {ip} 可用")
+                else:
+                    print(f"代理 {ip} 不可用")
+    except Exception as e:
+        print(f"验证代理 {ip} 失败:", e)
+
+
+def verify_all_ips():
+    run(async_verify_all_ips())
+
+
+async def async_verify_all_ips():
+    tasks = [verify_ip(ip) for ip in listIP]
+    await wait(tasks)
+
+
+if __name__ == '__main__':
+    ip_main()
+    verify_all_ips()
