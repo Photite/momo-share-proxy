@@ -43,9 +43,7 @@ async def getheaders():
 async def taskList(ss):
     task = [
         create_task(get_page('http://www.kxdaili.com/dailiip.html', session=ss)),
-        create_task(get_page('http://www.66ip.cn', session=ss)),
         create_task(get_page('https://www.kuaidaili.com/free', mod=2, session=ss)),
-        create_task(get_page('https://www.89ip.cn', mod=8, session=ss)),
         create_task(get_page('https://cdn.jsdelivr.net/gh/parserpp/ip_ports@master/proxyinfo.txt', mod=-1, session=ss)),
         create_task(get_page('https://fastly.jsdelivr.net/gh/parserpp/ip_ports@main/proxyinfo.txt', mod=-1, session=ss)),
         create_task(get_page('https://www.kuaidaili.com/free', mod=2, session=ss)),
