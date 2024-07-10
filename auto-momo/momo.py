@@ -15,6 +15,7 @@ if environ.get('GITHUB_RUN_ID', None):
 async def create_aiohttp(url, proxy_list):
     global n
     n = 0
+    print(url)
     async with ClientSession() as session:
         # 生成任务列表
         task = [create_task(web_request(url, proxy, session)) for proxy in proxy_list]
@@ -45,6 +46,9 @@ async def page(page_source):
 def main():
     ip_main()  # 抓取代理
     run(create_aiohttp(link, listIP))
+    
+
+
     print(f"墨墨分享链接访问成功{n}次。")
 
 
