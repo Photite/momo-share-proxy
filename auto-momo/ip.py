@@ -1,11 +1,12 @@
 # encoding:utf-8
-from asyncio import create_task, wait, Semaphore, run
+import asyncio
 from random import choice
 from aiohttp import ClientSession, ClientTimeout, TCPConnector
 from re import findall, search
 from os import environ
 
 listIP = []  # 保存IP地址
+validIPs = []  # 保存验证成功的IP地址
 global n
 n = 0
 
@@ -114,20 +115,10 @@ async def soup_page(source, mod):
         # 泥马代理
         ip_post = findall(r'<td>(.*?:\d+)</td>', source)
         for i in ip_post:
-            listIP.append(f"http://{i}")
-
-    elif mod == 5:
-        # 蝶鸟
-        ip_list = findall(r"<span\sclass='f-address'>(.*?)</span>", source)[1:]
-        port_list = findall(r"<span class='f-port'>(\d+)</span>", source)
-        for i in range(len(ip_list)):
-            listIP.append(f'http://{ip_list[i]}:{port_list[i]}')
-
-    elif mod == 6:
-        # 站大爷
-        pass
+            listIP.append(f'http://{i}')
+    
     elif mod == 7:
-        ips = findall(r'<td>.*?(\d+\.\d+\.\d+\.\d+)</td>', source)
+        ips = findall(r'<td>(\d+\.\d+\.\d+\.\d+)</td>', source)
         posts = findall(r'<td>(\d{1,5})</td>', source)
         for i in range(len(ips)):
             listIP.append(f'http://{ips[i]}:{posts[i]}')
@@ -151,6 +142,7 @@ async def verify_ip(ip):
             async with session.get(link, proxy=ip, timeout=ClientTimeout(total=5)) as response:
                 if response.status == 200:
                     print(f"代理 {ip} 可用")
+                    validIPs.append(ip)
                 else:
                     print(f"代理 {ip} 不可用")
     except Exception as e:
@@ -159,6 +151,9 @@ async def verify_ip(ip):
 
 def verify_all_ips():
     run(async_verify_all_ips())
+    print(f"共{len(validIPs)}个代理IP验证成功。")
+    for ip in validIPs:
+        print(f"可用代理IP：{ip}")
 
 
 async def async_verify_all_ips():
