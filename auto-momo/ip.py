@@ -3,14 +3,19 @@ from asyncio import create_task, wait, Semaphore, run
 from random import choice
 from aiohttp import ClientSession, ClientTimeout, TCPConnector
 from re import findall, search
+from os import environ
 
 listIP = []  # 保存IP地址
+global n
+n = 0
 
+link = 'link'
+if environ.get('GITHUB_RUN_ID', None):
+    link = environ['link']
 
 # 随机返回请求头
 async def getheaders():
     headers_list = [
-        "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",
         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/22.0.1207.1 Safari/537.1",
         "Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11",
         "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/536.6 (KHTML, like Gecko) Chrome/20.0.1092.0 Safari/536.6",
@@ -38,26 +43,19 @@ async def getheaders():
 async def taskList(ss):
     task = [
         create_task(get_page('http://www.kxdaili.com/dailiip.html', session=ss)),
-        create_task(get_page('https://proxy.seofangfa.com/', session=ss)),
         create_task(get_page('http://www.66ip.cn', session=ss)),
         create_task(get_page('https://www.kuaidaili.com/free', mod=2, session=ss)),
-        create_task(
-            get_page('https://www.89ip.cn', mod=8,
-                     session=ss)),
+        create_task(get_page('https://www.89ip.cn', mod=8, session=ss)),
         create_task(get_page('https://cdn.jsdelivr.net/gh/parserpp/ip_ports@master/proxyinfo.txt', mod=-1, session=ss)),
-        create_task(
-            get_page('https://fastly.jsdelivr.net/gh/parserpp/ip_ports@main/proxyinfo.txt', mod=-1, session=ss)),
+        create_task(get_page('https://fastly.jsdelivr.net/gh/parserpp/ip_ports@main/proxyinfo.txt', mod=-1, session=ss)),
         create_task(get_page('https://www.kuaidaili.com/free', mod=2, session=ss)),
         create_task(get_page('https://www.proxy-list.download/api/v1/get?type=http', mod=3, session=ss)),
     ]
 
     for i in range(1, 4):
-        task.append(create_task(get_page(f'http://www.nimadaili.com', mod=4, session=ss)))
-        task.append(create_task(get_page(f'https://www.89ip.cn', session=ss)))
         task.append(create_task(get_page(f'http://http.taiyangruanjian.com/free', mod=1, session=ss)))
         task.append(create_task(get_page(f'http://www.kxdaili.com/dailiip.html', session=ss)))
         task.append(create_task(get_page(f'http://www.ip3366.net/free/?stype=1&page={i}', session=ss)))
-        task.append(create_task(get_page(f'https://www.dieniao.com/FreeProxy/{i}.html', mod=5, session=ss)))
     return task
 
 
@@ -147,3 +145,15 @@ def ip_main():
     global listIP
     listIP = list(set(listIP))  # 代理去重
     print(f"代理ip抓取完成,共{len(listIP)}个可用代理ip地址。")
+
+    # 验证代理可用性
+    for ip in listIP:
+        try:
+            async with ClientSession() as session:
+                async with session.get(link, proxy=ip, timeout=ClientTimeout(total=5)) as response:
+                    if response.status == 200:
+                        print(f"代理 {ip} 可用")
+                    else:
+                        print(f"代理 {ip} 不可用")
+        except Exception as e:
+            print(f"验证代理 {ip} 失败:", e)
