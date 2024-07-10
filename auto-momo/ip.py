@@ -5,6 +5,8 @@ from aiohttp import ClientSession, ClientTimeout, TCPConnector
 from re import findall, search
 from os import environ
 
+from asyncio import run, create_task, wait, Semaphore  # 确保这些模块已导入
+
 listIP = []  # 保存IP地址
 validIPs = []  # 保存验证成功的IP地址
 global n
