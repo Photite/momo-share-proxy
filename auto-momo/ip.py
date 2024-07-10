@@ -53,7 +53,7 @@ async def taskList(ss):
 
     for i in range(1, 4):
         task.append(create_task(get_page(f'http://www.nimadaili.com', mod=4, session=ss)))
-        task.append(create_task(get_page(f'https://www.89ip.cn.html', session=ss)))
+        task.append(create_task(get_page(f'https://www.89ip.cn', session=ss)))
         task.append(create_task(get_page(f'http://http.taiyangruanjian.com/free', mod=1, session=ss)))
         task.append(create_task(get_page(f'http://www.kxdaili.com/dailiip.html', session=ss)))
         task.append(create_task(get_page(f'http://www.ip3366.net/free/?stype=1&page={i}', session=ss)))
