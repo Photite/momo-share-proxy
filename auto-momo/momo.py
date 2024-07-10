@@ -46,9 +46,6 @@ async def page(page_source):
 def main():
     ip_main()  # 抓取代理
     run(create_aiohttp(link, listIP))
-    
-
-
     print(f"墨墨分享链接访问成功{n}次。")
 
 
